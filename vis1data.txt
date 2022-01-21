@@ -1,0 +1,41 @@
+xpos dfs type date cost name
+(80-950) 950-80=870
+
+647 238 tropical-cyclone 2017-08-27 125 Hurricane Harvey
+459 159 severe-storm 2017-06-09 2.5 Minnesota Hail Storm and Upper Midwest Severe Weather
+383 127 severe-storm 2017-05-08 2.2 Colorado Hail Storm and Central Severe Weather
+280 84 severe-storm 2017-03-26 2.1 South/Southeast Severe Weather
+233 64 severe-storm 2017-03-06 2.1 Midwest Tornado Outbreak
+218 58 severe-storm 2017-02-28 1.8 Central/Southeast Tornado Outbreak
+352 114 flooding 2017-04-25 1.7 Missouri and Arkansas Flooding and Central Severe Weather
+171 38 flooding 2017-02-08 1.5 California Flooding
+125 19 severe-storm 2017-01-20 1.1 Southern Tornado Outbreak and Western Storms
+
+614 224 flooding 2016-08-12 10.3 Louisiana Flooding
+750 281 tropical-cyclone 2016-10-08 10.3 Hurricane Matthew
+80 0 drought-wildfire 2016-01-01 3.6 West/Northeast/Southeast Drought
+318 100 severe-storm 2016-04-10 3.6 North/Central Texas Hail Storm
+335 107 flooding 2016-04-17 2.8 Houston Flooding
+442 152 drought-wildfire 2016-06-01 2.5 Western/Southeast Wildfires
+356 116 severe-storm 2016-04-26 2.5 South/Southeast Tornadoes
+240 67 flooding 2016-03-08 2.4 Texas and Louisiana Flooding
+275 82 severe-storm 2016-03-23 2.1 North Texas Hail Storm
+385 128 severe-storm 2016-05-08 1.8 Plains Tornadoes and Central Severe Weather
+578 209 severe-storm 2016-07-28 1.5 Rockies and Northeast Severe Weather
+261 76 severe-storm 2016-03-17 1.2 Southern Severe Weather
+416 141 severe-storm 2016-05-21 1.2 Rockies/Central Tornadoes and Severe Weather
+204 52 severe-storm 2016-02-22 1.1 Southeast and Eastern Tornadoes
+
+(80-950) 950-80=870
+Jan - 0 80 
+Feb - 31 154
+Mar - 59 221
+Ap  - 90 295
+May - 120 366
+Jun - 151 440
+Jul - 181 511
+Aug - 212 585
+Sep - 243 659
+Oct - 273 731
+Nov - 304 805
+Dec - 334 876
