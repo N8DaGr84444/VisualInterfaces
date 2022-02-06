@@ -2,7 +2,7 @@
 Welcome to the repo of all of my lovely projects for my Data Visualization course at UC.
 
 ## Activities:
-- [Activity 2](Activity2/REAME.md)
+- [Activity 2](Activity2/README.md)
 - [Activity 3](Activity3/Activity3)
 - [Activity 4](Activity4/Activity4)
 - [Activity 5](Activity5)
