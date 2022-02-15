@@ -10,3 +10,4 @@ Welcome to the repo of all of my lovely projects for my Data Visualization cours
 - [Activity 8](Activity8)
 
 ## Projects:
+- [Project 1](Project1)

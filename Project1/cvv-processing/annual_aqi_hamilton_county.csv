@@ -1,0 +1,4 @@
+,State,County,Year,Days with AQI,Good Days,Moderate Days,Unhealthy for Sensitive Groups Days,Unhealthy Days,Very Unhealthy Days,Hazardous Days,Max AQI,90th Percentile AQI,Median AQI,Days CO,Days NO2,Days Ozone,Days SO2,Days PM2.5,Days PM10
+679,Ohio,Hamilton,2019,365,162,197,6,0,0,0,119,77,52,0,7,152,0,206,0
+668,Ohio,Hamilton,2020,366,210,149,7,0,0,0,126,70,48,0,14,123,2,227,0
+636,Ohio,Hamilton,2021,304,162,137,5,0,0,0,140,77,48,0,9,137,3,155,0
