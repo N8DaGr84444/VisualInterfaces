@@ -32,6 +32,30 @@ class V5 {
         vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
+        // scales
+        vis.xScale = d3.scaleLinear()
+            .range([0, vis.width]);
+        
+        vis.yScale = d3.scaleBand()
+            .range([0, vis.height]);
+
+        // init axis
+        vis.xAxis = d3.axisBottom(vis.xScale);
+        vis.yAxis = d3.axisLeft(vis.yScale);
+
+        // draw axis
+        vis.xAxisGroup = vis.chart.append("g")
+            .attr('class', 'axis x-axis')
+            .attr('transform', `translate(0, ${vis.height})`);
+
+        vis.yAxisGroup = vis.chart.append("g")
+            .attr('class', 'axis y-axis');
+    }
+
+    //leave this empty for now
+    updateVis() { 
+        let vis = this;
+
         // process data
         vis.processedData = []
         let totalDays = vis.data[0].total
@@ -39,31 +63,21 @@ class V5 {
             vis.processedData.push({"cat": d.cat, "stat": d.stat / 365 * 100})
         });
 
-        console.log('processed data: ', vis.processedData)
-
-        // scales
-        vis.xScale = d3.scaleLinear()
-            .domain([0, d3.max(vis.processedData, d => d.stat)])
-            .range([0, vis.width])
-        
-        vis.yScale = d3.scaleBand()
-            .domain(vis.processedData.map(d => d.cat))
-            .range([0, vis.height])
+        // set scale domains
+        vis.xScale.domain([0, d3.max(vis.processedData, d => d.stat)]);
+        vis.yScale.domain(vis.processedData.map(d => d.cat))
             .paddingInner(0.1);
 
-        // init axis
-        vis.xAxis = d3.axisBottom(vis.xScale).tickSizeOuter(0);
-        vis.yAxis = d3.axisLeft(vis.yScale).tickSizeOuter(0);
+        // configure ticks
+        vis.xAxis.tickSizeOuter(0);
+        vis.yAxis.tickSizeOuter(0);
 
-        // draw axis
-        vis.xAxisGroup = vis.chart.append("g")
-            .attr('class', 'axis x-axis')
-            .attr('transform', `translate(0, ${vis.height})`)
-            .call(vis.xAxis);
-        
-        vis.yAxisGroup = vis.chart.append("g")
-            .attr('class', 'axis y-axis')
-            .call(vis.yAxis);
+        vis.renderVis();
+    }
+  
+    //leave this empty for now...
+    renderVis() { 
+        let vis = this;
 
         // Add rectangles
         vis.chart.selectAll('rect')
@@ -76,16 +90,9 @@ class V5 {
                 .attr('height', vis.yScale.bandwidth())
                 .attr('y', d => vis.yScale(d.cat))
                 .attr('x', 0);
-    }
-
-    //leave this empty for now
-    updateVis() { 
         
-    
-    }
-  
-    //leave this empty for now...
-    renderVis() { 
-    
+        // Draw axis
+        vis.xAxisGroup.call(vis.xAxis);
+        vis.yAxisGroup.call(vis.yAxis);
     }  
 }

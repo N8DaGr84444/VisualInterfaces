@@ -1,4 +1,4 @@
-class Line {
+class V1 {
 
     constructor(_config, _data) {
         this.config = {
@@ -24,8 +24,7 @@ class Line {
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
         
         // group the data: I want to draw one line per group
-        const sumstat = d3.group(vis.data, d => d.cat); // nest function allows to group the calculation per level of a factor
-        console.log('Sumstat: ', sumstat);
+        vis.sumstat = d3.group(vis.data, d => d.cat); // nest function allows to group the calculation per level of a factor
     
         // // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement)
@@ -36,60 +35,59 @@ class Line {
         vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
     
-    
         // // Initialize axes
-        // Add X axis --> it is a date format
-        console.log('x axis')
-        const x = d3.scaleLinear()
-            .domain(d3.extent(vis.data, function(d) { return d.year; }))
-            .range([ 0, vis.width ]);
-        console.log('appending x axis')
-        vis.chart.append("g")
-            .attr("transform", `translate(0, ${vis.height})`)
-            .call(d3.axisBottom(x).tickSizeOuter(0)
-                .ticks(d3.count(vis.data, function(d) { return d.year; }) /6));
+        // Add X axis
+        vis.xScale = d3.scaleLinear().range([ 0, vis.width ]);
+        vis.xAxis = d3.axisBottom(vis.xScale).tickSizeOuter(0)
+            .ticks(d3.count(vis.data, (d) => d.year) / 6);    
         // Year is divided by 3 cuz each year appears 3 times (median, max, and 90th percentile), and we only need
         // each year once. Then divided by 2 so only every other year appears (thus divided by 6).
+        
+        vis.xAxisG = vis.chart.append("g")
+            .attr("class", "axis x-axis")
+            .attr("transform", `translate(0, ${vis.height})`)
 
         // Add Y axis
-        console.log('y axis')
-        const y = d3.scaleLinear()
-            .domain([0, d3.max(vis.data, function(d) { return d.stat; })])
-            .range([ vis.height, 0 ]);
-        vis.chart.append("g")
-            .call(d3.axisLeft(y).tickSizeOuter(0));
+        vis.yScale = d3.scaleLinear().range([ vis.height, 0 ]);
+        vis.yAxis = d3.axisLeft(vis.yScale).tickSizeOuter(0);
 
-        // // Draw the line
-        // color palette
-        console.log('color palette')
-        const color = d3.scaleOrdinal()
-            .range(['#e41a1c','#377eb8','#4daf4a'])
-
-        console.log('drawing line')
-        vis.chart.selectAll(".line")
-            .data(sumstat)
-            .join("path")
-                .attr("stroke", function(d){ return color(d[0]) })
-                .attr('fill', 'none')
-                .attr('stroke-width', 2)
-                .attr("d", function(d){
-                    console.log('function d: ', d)
-                    return d3.line()
-                        .x(function(d) { return x(d.year); })
-                        .y(function(d) { return y(d.stat); })
-                        (d[1]) //this is the array of values 
-                })
+        vis.yAxisG = vis.chart.append("g")
+            .attr("class", "axis y-axis");
   
     }
 
-    //leave this empty for now
     updateVis() { 
-        
-    
+        let vis = this;
+
+        // Set scale domains
+        vis.xScale.domain(d3.extent(vis.data, (d) => d.year))
+        vis.yScale.domain([0, d3.max(vis.data, (d) => d.stat)])
+                // color palette
+        vis.colorScale = d3.scaleOrdinal()
+                .range(['#e41a1c','#377eb8','#4daf4a'])
+
+        vis.renderVis()
     }
   
     //leave this empty for now...
     renderVis() { 
-    
+        let vis = this;
+
+        vis.chart.selectAll(".line")
+            .data(vis.sumstat)
+            .join("path")
+                .attr("stroke", (d) => vis.colorScale(d[0]))
+                .attr('fill', 'none')
+                .attr('stroke-width', 2)
+                .attr("d", function(d){
+                    return d3.line()
+                        .x((d) => vis.xScale(d.year))
+                        .y((d) => vis.yScale(d.stat))
+                        (d[1]) //this is the array of values 
+                })
+        
+        // Update axis
+        vis.xAxisG.call(vis.xAxis);
+        vis.yAxisG.call(vis.yAxis);
     }  
 }

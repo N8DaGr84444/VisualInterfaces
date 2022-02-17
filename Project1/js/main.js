@@ -51,37 +51,40 @@ d3.csv('data/annual_aqi_hamilton_county.csv')
     //Be sure to send it the costsPerYear data 
     // The svg for this element has already been created in index.html, above the timeline circles- check it out
     
-    let vis1 = new Line({
+    let vis1 = new V1({
         'parentElement': '#v1',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v1data);
+    vis1.updateVis();
 
-    let vis2 = new StackedAreaChartFinal({
+    let vis2 = new V2({
         'parentElement': '#v2',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v2data);
     vis2.updateVis();
 
-    let vis3 = new V3Bar({
+    let vis3 = new V3({
         'parentElement': '#v3',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v3data);
-    // vis3.updateVis();
+    vis3.updateVis();
 
     let vis4 = new V4({
         'parentElement': '#v4',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v4data);
+    vis4.updateVis();
 
     let vis5 = new V5({
         'parentElement': '#v5',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v5data);
+    vis5.updateVis();
 
 })
 .catch(error => {
