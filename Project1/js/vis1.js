@@ -46,7 +46,8 @@ class Line {
         console.log('appending x axis')
         vis.chart.append("g")
             .attr("transform", `translate(0, ${vis.height})`)
-            .call(d3.axisBottom(x).ticks(d3.count(vis.data, function(d) { return d.year; }) /6));
+            .call(d3.axisBottom(x).tickSizeOuter(0)
+                .ticks(d3.count(vis.data, function(d) { return d.year; }) /6));
         // Year is divided by 3 cuz each year appears 3 times (median, max, and 90th percentile), and we only need
         // each year once. Then divided by 2 so only every other year appears (thus divided by 6).
 
@@ -56,7 +57,7 @@ class Line {
             .domain([0, d3.max(vis.data, function(d) { return d.stat; })])
             .range([ vis.height, 0 ]);
         vis.chart.append("g")
-            .call(d3.axisLeft(y));
+            .call(d3.axisLeft(y).tickSizeOuter(0));
 
         // // Draw the line
         // color palette

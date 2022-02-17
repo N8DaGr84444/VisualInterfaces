@@ -64,7 +64,7 @@ d3.csv('data/annual_aqi_hamilton_county.csv')
     }, v2data);
     vis2.updateVis();
 
-    let vis3 = new V3Line({
+    let vis3 = new V3Bar({
         'parentElement': '#v3',
         'containerHeight': 200,
         'containerWidth': 1000
