@@ -5,7 +5,7 @@ class V5 {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 140,
-            margin: { top: 10, bottom: 30, right: 50, left: 100 }
+            margin: { top: 30, bottom: 30, right: 50, left: 115 }
         }
   
         this.data = _data;
@@ -26,7 +26,15 @@ class V5 {
         // // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement)
             .attr('width', vis.config.containerWidth)
-            .attr('height', vis.config.containerHeight);
+            .attr('height', vis.config.containerHeight)
+        
+        // Add svg title
+        vis.svg.append("text")
+            .attr("y", 25)
+            .attr("x", vis.width / 2 + 100)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "20px")
+            .text("Percentage of Days in Year Each Pollutant was Main Pollutant");
     
         // // Append group element that will contain our actual chart (see margin convention)
         vis.chart = vis.svg.append('g')
@@ -91,8 +99,23 @@ class V5 {
                 .attr('y', d => vis.yScale(d.cat))
                 .attr('x', 0);
         
-        // Draw axis
-        vis.xAxisGroup.call(vis.xAxis);
-        vis.yAxisGroup.call(vis.yAxis);
+        // Update axis
+        vis.xAxisGroup.call(vis.xAxis)
+            .append("text")
+                .attr("y", 3)
+                .attr("x", vis.width + 25)
+                .attr("text-anchor", "end")
+                .attr("stroke", "black")
+                .text("Days");
+
+        vis.yAxisGroup.call(vis.yAxis)
+            .append("text")
+                .attr("y", -55)
+                .attr("dy", "-5.1em")
+                .attr("x", - vis.height / 2 + 5)
+                .attr("transform", "rotate(-90)")
+                .attr("text-anchor", "end")
+                .attr("stroke", "black")
+                .text("Category");
     }  
 }

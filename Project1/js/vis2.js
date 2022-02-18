@@ -9,7 +9,7 @@ class V2 {
         parentElement: _config.parentElement,
         containerWidth: _config.containerWidth || 500,
         containerHeight: _config.containerHeight || 140,
-        margin: { top: 10, bottom: 30, right: 50, left: 50 }
+        margin: { top: 40, bottom: 30, right: 50, left: 50 }
     };
     this.data = _data;
     this.initVis();
@@ -47,6 +47,14 @@ class V2 {
       .attr("width", vis.config.containerWidth)
       .attr("height", vis.config.containerHeight);
 
+    // Add svg title
+    vis.svg.append("text")
+        .attr("y", 25)
+        .attr("x", vis.width / 2 + 100)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Shifts in Pollutants Over Time");
+
     // Append group element that will contain our actual chart (see margin convention)
     vis.chartContainer = vis.svg
       .append("g")
@@ -67,14 +75,6 @@ class V2 {
     vis.yAxisG = vis.chart.append("g").attr("class", "axis y-axis");
 
     vis.stack = d3.stack().keys([0, 1, 2, 3, 4, 5]);
-
-    // vis.axisTitle = vis.chartContainer
-    //   .append("text")
-    //   .attr("class", "axis-label")
-    //   .attr("y", -18)
-    //   .attr("x", -25)
-    //   .attr("dy", "0.35em")
-    //   .text("Trillion m³");
 
     /*
     // We need to make sure that the tracking area is on top of other chart elements
@@ -151,8 +151,23 @@ class V2 {
       .attr("d", vis.area)
       .attr("fill", (d) => vis.colorScale(d.key));
     
-    // Update the axes
-    vis.xAxisG.call(vis.xAxis);
-    vis.yAxisG.call(vis.yAxis);
+    // Update axis
+    vis.xAxisG.call(vis.xAxis)
+        .append("text")
+            .attr("y", 3)
+            .attr("x", vis.width + 25)
+            .attr("text-anchor", "end")
+            .attr("stroke", "black")
+            .text("Year");
+
+    vis.yAxisG.call(vis.yAxis)
+        .append("text")
+            .attr("y", 15)
+            .attr("dy", "-5.1em")
+            .attr("x", - vis.height / 2 + 5)
+            .attr("transform", "rotate(-90)")
+            .attr("text-anchor", "end")
+            .attr("stroke", "black")
+            .text("Days");
   }
 }

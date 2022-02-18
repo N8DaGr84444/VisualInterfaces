@@ -5,7 +5,7 @@ class V1 {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 140,
-            margin: { top: 10, bottom: 30, right: 50, left: 50 }
+            margin: { top: 40, bottom: 30, right: 50, left: 50 }
         }
   
         this.data = _data;
@@ -30,7 +30,15 @@ class V1 {
         vis.svg = d3.select(vis.config.parentElement)
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
-    
+        
+        // Add svg title
+        vis.svg.append("text")
+            .attr("y", 25)
+            .attr("x", vis.width / 2 + 100)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "20px")
+            .text("AQI Changes Over Time");
+
         // // Append group element that will contain our actual chart (see margin convention)
         vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
@@ -87,7 +95,22 @@ class V1 {
                 })
         
         // Update axis
-        vis.xAxisG.call(vis.xAxis);
-        vis.yAxisG.call(vis.yAxis);
+        vis.xAxisG.call(vis.xAxis)
+            .append("text")
+                .attr("y", 3)
+                .attr("x", vis.width + 25)
+                .attr("text-anchor", "end")
+                .attr("stroke", "black")
+                .text("Year");
+
+        vis.yAxisG.call(vis.yAxis)
+            .append("text")
+                .attr("y", 15)
+                .attr("dy", "-5.1em")
+                .attr("x", - vis.height / 2 + 5)
+                .attr("transform", "rotate(-90)")
+                .attr("text-anchor", "end")
+                .attr("stroke", "black")
+                .text("AQI");
     }  
 }
