@@ -6,7 +6,8 @@ class V1 {
             containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 140,
             margin: { top: 40, bottom: 35, right: 50, left: 50 },
-            inputCounty: 'Honolulu'
+            inputCounty: 'Honolulu',
+            tooltipPadding: _config.tooltipPadding || 15
         }
   
         this.data = _data;
@@ -33,8 +34,8 @@ class V1 {
         // Add svg title
         vis.svg.append("text")
             .attr("y", 25)
-            .attr("x", vis.chartWidth - 60)
-            .attr("text-anchor", "end")
+            .attr("x", vis.width / 2 + 40)
+            .attr("text-anchor", "middle")
             .attr("font-size", "20px")
             .text("AQI Changes Over Time");
 
@@ -111,7 +112,7 @@ class V1 {
 
         // Remove old lines
         vis.chart.selectAll("path").remove();
-        vis.chart2.selectAll("path").remove();
+        vis.chart2.selectAll("path").remove().transition();
 
         // Process data
         vis.hamiltonData = []
@@ -152,7 +153,7 @@ class V1 {
     renderVis() { 
         let vis = this;
 
-        vis.chart.selectAll(".line")
+        vis.hamiltonline = vis.chart.selectAll(".line")
             .data(vis.hamiltonSumstat)
             .join("path")
                 .attr("stroke", (d) => vis.colorScale(d[0]))
@@ -164,10 +165,45 @@ class V1 {
                         .y((d) => vis.hamiltonyScale(d.stat))
                         (d[1]) //this is the array of values 
                 })
+        
+        vis.hamiltoncircle = vis.chart.selectAll("circle")
+            .data(vis.hamiltonData)
+            .join("circle")
+                .attr("class", "selectCircle")
+                .attr("cx", (d) => vis.hamiltonxScale(d.year))
+                .attr("cy", (d) => vis.hamiltonyScale(d.stat))
+                .attr("r", 2)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("fill", "white");
+        
+        function processTitle(title) {
+            if (title == "90p") {
+                return "90th percentile";
+            }
+            else {return title;}
+        }
+
+        vis.hamiltoncircle.on('mouseover', (event,d) => {
+            let title = processTitle(d.cat)
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(`
+                <div class="tooltip-title">${title}</div>
+                <div><i>${d.year}</i></div>
+                <div><i>AQI: ${d.stat}</i></div>
+                `);
+        })
+        .on('mouseleave', () => {
+            d3.select('#tooltip').style('display', 'none');
+        });
 
         vis.chart2.selectAll(".line")
             .data(vis.compareSumstat)
             .join("path")
+                .transition()
                 .attr("stroke", (d) => vis.colorScale(d[0]))
                 .attr('fill', 'none')
                 .attr('stroke-width', 2)
@@ -177,6 +213,33 @@ class V1 {
                         .y((d) => vis.compareyScale(d.stat))
                         (d[1]) //this is the array of values 
                 })
+
+        vis.comparecircle = vis.chart2.selectAll("circle")
+            .data(vis.compareData)
+            .join("circle")
+                .attr("class", "selectCircle")
+                .attr("cx", (d) => vis.comparexScale(d.year))
+                .attr("cy", (d) => vis.compareyScale(d.stat))
+                .attr("r", 2)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("fill", "white");
+
+        vis.comparecircle.on('mouseover', (event,d) => {
+            let title = processTitle(d.cat)
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(`
+                <div class="tooltip-title">${title}</div>
+                <div><i>${d.year}</i></div>
+                <div><i>AQI: ${d.stat}</i></div>
+                `);
+        })
+        .on('mouseleave', () => {
+            d3.select('#tooltip').style('display', 'none');
+        });
 
         // Update axis
         vis.hamiltonxAxisG.call(vis.hamiltonxAxis);

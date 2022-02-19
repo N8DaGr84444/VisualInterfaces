@@ -7,10 +7,12 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body onload="defaultTab()">
-    <h1>Project 1: Bad Air</h1>
+    <h2>Assessing Trends in Bad Air Quality</h2>
+    <h5 style="margin-top: -10px; margin-bottom: 5px;">Created By: Nate Alter</h5>
     <div class="tab">
         <button class="tablinks" onclick="openView(event, 'aqiOverview')" id="defaultOpen">AQI Overview</button>
         <button class="tablinks" onclick="openView(event, 'aqiPollutant')">AQI by Pollutant</button>
+        <button class="tablinks" onclick="openView(event, 'data')">Data Source</button>
         <select id="county-selection" style="float: right; height: 47px;">
             <option value="Honolulu">Honolulu, Hawaii</option>
             <option value="Montgomery">Montgomery, Maryland</option>
@@ -37,6 +39,14 @@
         <svg id="v2"></svg>
         <svg id="v5"></svg>
     </div>
+
+    <div id="data" class="tabcontent">
+        <h4>Data Source: </h4>
+        US Environmental Protection Agency. Air Quality System Data Mart [internet database] available via
+        https://www.epa.gov/outdoor-air-quality-data. Accessed February 18, 2022.
+    </div>
+
+    <div id="tooltip"></div>
 
     <!-- D3 bundle -->
     <script src="js/d3.v6.min.js"></script>

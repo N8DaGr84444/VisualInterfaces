@@ -6,7 +6,8 @@ class V3 {
             containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 140,
             margin: { top: 40, bottom: 35, right: 50, left: 50 },
-            inputCounty: 'Honolulu'
+            inputCounty: 'Honolulu',
+            tooltipPadding: _config.tooltipPadding || 15
         }
   
         this.data = _data;
@@ -33,8 +34,8 @@ class V3 {
         // Add svg title
         vis.svg.append("text")
             .attr("y", 25)
-            .attr("x", vis.chartWidth / 2 - 150)
-            .attr("text-anchor", "start")
+            .attr("x", vis.width / 2 + 60)
+            .attr("text-anchor", "middle")
             .attr("font-size", "20px")
             .text("Days in Each Year Without an AQI Measurement");
 
@@ -117,7 +118,7 @@ class V3 {
 
         // Remove old lines
         vis.chart.selectAll("rect").remove();
-        vis.chart2.selectAll("rect").remove();
+        vis.chart2.selectAll("rect").remove().transition();
 
         // Process data
         vis.hamiltonData = []
@@ -156,7 +157,7 @@ class V3 {
         let vis = this;
     
         // Add rectangles
-        vis.chart.selectAll('rect')
+        vis.hamiltonrect = vis.chart.selectAll('rect')
             .data(vis.hamiltonData)
             .enter()
             .append('rect')
@@ -167,7 +168,21 @@ class V3 {
                 .attr('y', d => vis.hamiltonyScale(d.stat))
                 .attr('x', d => vis.hamiltonxScale(d.year));
 
-        vis.chart2.selectAll('rect')
+        vis.hamiltonrect.on('mouseover', (event,d) => {
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(`
+                <div class="tooltip-title">${d.year}</div>
+                <div><i>${d.stat} days</i></div>
+                `);
+        })
+        .on('mouseleave', () => {
+            d3.select('#tooltip').style('display', 'none');
+        });
+
+        vis.comparerect = vis.chart2.selectAll('rect')
             .data(vis.compareData)
             .enter()
             .append('rect')
@@ -177,7 +192,21 @@ class V3 {
                 .attr('height', d => vis.height - vis.compareyScale(d.stat))
                 .attr('y', d => vis.compareyScale(d.stat))
                 .attr('x', d => vis.comparexScale(d.year));
-            
+
+        vis.comparerect.on('mouseover', (event,d) => {
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(`
+                <div class="tooltip-title">${d.year}</div>
+                <div><i>${d.stat} days</i></div>
+                `);
+        })
+        .on('mouseleave', () => {
+            d3.select('#tooltip').style('display', 'none');
+        });
+
         // Update axis
         vis.hamiltonxAxisGroup.call(vis.hamiltonxAxis);
         

@@ -6,7 +6,8 @@ class V5 {
             containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 140,
             margin: { top: 40, bottom: 35, right: 50, left: 70 },
-            inputCounty: 'Honolulu'
+            inputCounty: 'Honolulu',
+            tooltipPadding: _config.tooltipPadding || 15
         }
   
         this.data = _data;
@@ -33,10 +34,10 @@ class V5 {
         // Add svg title
         vis.svg.append("text")
             .attr("y", 25)
-            .attr("x", vis.chartWidth - 60)
+            .attr("x", vis.width / 2 + 70)
             .attr("text-anchor", "middle")
             .attr("font-size", "20px")
-            .text("Percentage of Days in Year Each Pollutant was Main Pollutant");
+            .text("Percentage of Days in the Year Each Pollutant was Main Pollutant");
     
         // // Append group element that will contain our actual chart (see margin convention)
         vis.chart = vis.svg.append('g')
@@ -111,7 +112,7 @@ class V5 {
 
         // Remove old lines
         vis.chart.selectAll("rect").remove();
-        vis.chart2.selectAll("rect").remove();
+        vis.chart2.selectAll("rect").remove().transition();
 
         // Process data
         vis.hamiltonData = []
@@ -162,7 +163,7 @@ class V5 {
         let vis = this;
 
         // Add rectangles
-        vis.chart.selectAll('rect')
+        vis.hamiltonrect = vis.chart.selectAll('rect')
             .data(vis.hamiltonProcessedData)
             .enter()
             .append('rect')
@@ -173,7 +174,26 @@ class V5 {
                 .attr('y', d => vis.hamiltonyScale(d.cat))
                 .attr('x', 0);
 
-        vis.chart2.selectAll('rect')
+        function fixPercent(percent) {
+            return parseInt(percent);
+        }
+
+        vis.hamiltonrect.on('mouseover', (event,d) => {
+            let percent = fixPercent(d.stat)
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(`
+                <div class="tooltip-title">${d.cat}</div>
+                <div><i>${percent}% of days</i></div>
+                `);
+        })
+        .on('mouseleave', () => {
+            d3.select('#tooltip').style('display', 'none');
+        });
+
+        vis.comparerect = vis.chart2.selectAll('rect')
             .data(vis.compareProcessedData)
             .enter()
             .append('rect')
@@ -183,6 +203,25 @@ class V5 {
                 .attr('height', vis.compareyScale.bandwidth())
                 .attr('y', d => vis.compareyScale(d.cat))
                 .attr('x', 0);
+
+        function fixPercent(percent) {
+            return parseInt(percent);
+        }
+
+        vis.comparerect.on('mouseover', (event,d) => {
+            let percent = fixPercent(d.stat)
+            d3.select('#tooltip')
+                .style('display', 'block')
+                .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+                .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                .html(`
+                <div class="tooltip-title">${d.cat}</div>
+                <div><i>${percent}% of days</i></div>
+                `);
+        })
+        .on('mouseleave', () => {
+            d3.select('#tooltip').style('display', 'none');
+        });
         
         // Update axis
         vis.hamiltonxAxisGroup.call(vis.hamiltonxAxis);
