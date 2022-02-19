@@ -1,173 +1,187 @@
 class V2 {
-  /**
-   * Class constructor with basic chart configuration
-   * @param {Object}
-   * @param {Array}
-   */
-  constructor(_config, _data) {
-    this.config = {
-        parentElement: _config.parentElement,
-        containerWidth: _config.containerWidth || 500,
-        containerHeight: _config.containerHeight || 140,
-        margin: { top: 40, bottom: 30, right: 50, left: 50 }
-    };
-    this.data = _data;
-    this.initVis();
-  }
 
-  /**
-   * Initialize scales/axes and append static chart elements
-   */
-  initVis() {
-    let vis = this;
-
-    vis.width =
-      vis.config.containerWidth -
-      vis.config.margin.left -
-      vis.config.margin.right;
-    vis.height =
-      vis.config.containerHeight -
-      vis.config.margin.top -
-      vis.config.margin.bottom;
-
-    vis.xScale = d3.scaleLinear().range([0, vis.width]);
-
-    vis.yScale = d3.scaleLinear().range([vis.height, 0]);
-
-    vis.colorScale = d3.scaleOrdinal().range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33']);
-
-    // Initialize axes
-    vis.xAxis = d3.axisBottom(vis.xScale).tickFormat(d3.format("d")); // Remove thousand comma
-
-    vis.yAxis = d3.axisLeft(vis.yScale);
-
-    // Define size of SVG drawing area
-    vis.svg = d3
-      .select(vis.config.parentElement)
-      .attr("width", vis.config.containerWidth)
-      .attr("height", vis.config.containerHeight);
-
-    // Add svg title
-    vis.svg.append("text")
-        .attr("y", 25)
-        .attr("x", vis.width / 2 + 100)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "20px")
-        .text("Shifts in Pollutants Over Time");
-
-    // Append group element that will contain our actual chart (see margin convention)
-    vis.chartContainer = vis.svg
-      .append("g")
-      .attr(
-        "transform",
-        `translate(${vis.config.margin.left},${vis.config.margin.top})`
-      );
-
-    vis.chart = vis.chartContainer.append("g");
-
-    // Append empty x-axis group and move it to the bottom of the chart
-    vis.xAxisG = vis.chart
-      .append("g")
-      .attr("class", "axis x-axis")
-      .attr("transform", `translate(0,${vis.height})`);
-
-    // Append y-axis group
-    vis.yAxisG = vis.chart.append("g").attr("class", "axis y-axis");
-
-    vis.stack = d3.stack().keys([0, 1, 2, 3, 4, 5]);
-
-    /*
-    // We need to make sure that the tracking area is on top of other chart elements
-    vis.marks = vis.chart.append('g');
-    vis.trackingArea = vis.chart.append('rect')
-        .attr('width', vis.width)
-        .attr('height', vis.height)
-        .attr('fill', 'none')
-        .attr('pointer-events', 'all');
-
-        //(event,d) => {
-
-    // Empty tooltip group (hidden by default)
-    vis.tooltip = vis.chart.append('g')
-        .attr('class', 'tooltip')
-        .style('display', 'none');
-
-    vis.tooltip.append('text');
-    */
-  }
-
-  /**
-   * Prepare the data and scales before we render it.
-   */
-  updateVis() {
-    let vis = this;
-
-    // Group the data per year
-    vis.groupedData = d3.groups(vis.data, (d) => d.year);
-
-    // Prepare the data for rendering
-    vis.stack.value((d, key) => d[1][key].stat);
-    vis.stackedData = vis.stack(vis.groupedData);
-
-    vis.area = d3.area()
-      .x((d, i) => vis.xScale(d.data[0]))
-      .y0((d) => vis.yScale(d[0]))
-      .y1((d) => vis.yScale(d[1]));
-    //.curve(d3.curveStepAfter);
-
-    // Set the scale input domains
-    vis.xScale.domain(d3.extent(vis.data, (d) => d.year));
-    vis.xAxis.tickSizeOuter(0);
-    vis.colorScale.domain([0, 1, 2, 3, 4, 5]);
-
-    vis.yScale.domain([0, d3.max(vis.stackedData[vis.stackedData.length - 1], (d) => d[1])]);
-    // vis.yScale.domain([0, 365]);
-    // vis.yAxis.tickFormat((d) => d / 1000);
-    vis.yAxis.tickSizeOuter(0);
-
-    // vis.yScale = d3.scaleLinear()
-    //     .domain([0, 365])
-    //     .range([vis.height, 0]); 
-
-    vis.renderVis();
-  }
-
-  /**
-   * This function contains the D3 code for binding data to visual elements
-   * Important: the chart is not interactive yet and renderVis() is intended
-   * to be called only once; otherwise new paths would be added on top
-   */
-  renderVis() {
-    let vis = this;
-
-    // Add line path
-    console.log(vis.stackedData);
-    vis.chart
-      .selectAll(".area-path")
-      .data(vis.stackedData)
-      .join("path")
-      .transition()
-      .attr("class", "area-path")
-      .attr("d", vis.area)
-      .attr("fill", (d) => vis.colorScale(d.key));
+    constructor(_config, _data) {
+        this.config = {
+            parentElement: _config.parentElement,
+            containerWidth: _config.containerWidth || 500,
+            containerHeight: _config.containerHeight || 140,
+            margin: { top: 40, bottom: 35, right: 50, left: 50 },
+            inputCounty: 'Honolulu'
+        }
+  
+        this.data = _data;
     
-    // Update axis
-    vis.xAxisG.call(vis.xAxis)
-        .append("text")
-            .attr("y", 3)
-            .attr("x", vis.width + 25)
+        // Call a class function
+        this.initVis();
+    }
+  
+    initVis() {
+        
+        let vis = this; //this is a keyword that can go out of scope, especially in callback functions, 
+                        //so it is good to create a variable that is a reference to 'this' class instance
+    
+        //set up the width and height of the area where visualizations will go- factoring in margins               
+        vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
+        vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
+        vis.chartWidth = vis.width / 2 - 30;
+    
+        // // Define size of SVG drawing area
+        vis.svg = d3.select(vis.config.parentElement)
+            .attr('width', vis.config.containerWidth)
+            .attr('height', vis.config.containerHeight);
+        
+        // Add svg title
+        vis.svg.append("text")
+            .attr("y", 25)
+            .attr("x", vis.chartWidth + 50)
             .attr("text-anchor", "end")
+            .attr("font-size", "20px")
+            .text("Percentage of Days Each Pollutant was Main Pollutant");
+
+        // // Append group element that will contain our actual chart (see margin convention)
+        vis.chart = vis.svg.append('g')
+            .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
+        vis.chart2 = vis.svg.append('g')
+            .attr('transform', `translate(${vis.config.margin.left + vis.chartWidth + 80},${vis.config.margin.top})`);
+
+
+        // // Initialize axes
+        // Add X axis
+        vis.hamiltonxScale = d3.scaleLinear().range([ 0, vis.chartWidth ]);
+        vis.hamiltonxAxis = d3.axisBottom(vis.hamiltonxScale).tickFormat(d3.format("d")); // Remove thousand comma
+        
+        vis.hamiltonxAxisG = vis.chart.append("g")
+            .attr("class", "axis x-axis")
+            .attr("transform", `translate(0, ${vis.height})`)
+        vis.hamiltonxAxisG.append("text")
+            .attr("y", 30)
+            .attr("x", vis.chartWidth / 2)
+            .attr("text-anchor", "middle")
             .attr("stroke", "black")
             .text("Year");
 
-    vis.yAxisG.call(vis.yAxis)
-        .append("text")
+        vis.comparexScale = d3.scaleLinear().range([ 0, vis.chartWidth ]);
+        vis.comparexAxis = d3.axisBottom(vis.comparexScale).tickFormat(d3.format("d")); // Remove thousand comma
+        
+        vis.comparexAxisG = vis.chart2.append("g")
+            .attr("class", "axis x-axis")
+            .attr("transform", `translate(0, ${vis.height})`)
+        vis.comparexAxisG.append("text")
+            .attr("y", 30)
+            .attr("x", vis.chartWidth / 2)
+            .attr("text-anchor", "middle")
+            .attr("stroke", "black")
+            .text("Year");
+
+        // Add Y axis
+        vis.hamiltonyScale = d3.scaleLinear().range([ vis.height, 0 ]);
+        vis.hamiltonyAxis = d3.axisLeft(vis.hamiltonyScale).tickSizeOuter(0);
+
+        vis.hamiltonyAxisG = vis.chart.append("g")
+            .attr("class", "axis y-axis");
+        vis.hamiltonyAxisG.append("text")
             .attr("y", 15)
             .attr("dy", "-5.1em")
             .attr("x", - vis.height / 2 + 5)
             .attr("transform", "rotate(-90)")
             .attr("text-anchor", "end")
             .attr("stroke", "black")
-            .text("Days");
-  }
+            .text("Days (%)");
+
+        vis.compareyScale = d3.scaleLinear().range([ vis.height, 0 ]);
+        vis.compareyAxis = d3.axisLeft(vis.compareyScale).tickSizeOuter(0);
+
+        vis.compareyAxisG = vis.chart2.append("g")
+            .attr("class", "axis y-axis");
+        vis.compareyAxisG.append("text")
+            .attr("y", 15)
+            .attr("dy", "-5.1em")
+            .attr("x", - vis.height / 2 + 5)
+            .attr("transform", "rotate(-90)")
+            .attr("text-anchor", "end")
+            .attr("stroke", "black")
+            .text("Days (%)");
+    }
+
+    updateVis() { 
+        let vis = this;
+
+        // Remove old lines
+        vis.chart.selectAll("path").remove();
+        vis.chart2.selectAll("path").remove();
+
+        // Process data
+        vis.hamiltonData = []
+        vis.data.forEach(d => {
+            if (d.county == "Hamilton") {
+                vis.hamiltonData.push({"year": d.year, "cat": d.cat, "stat": d.stat / 365 * 100});
+            }
+        }); 
+
+        vis.compareData = []
+        vis.data.forEach(d => {
+            if (d.county == vis.config.inputCounty) {
+                vis.compareData.push({"year": d.year, "cat": d.cat, "stat": d.stat / 365 * 100});
+            }
+        });
+
+        // group the data: I want to draw one line per group
+        vis.hamiltonSumstat = d3.group(vis.hamiltonData, d => d.cat);  // nest function allows to group the calculation per level of a factor
+        vis.compareSumstat = d3.group(vis.compareData, d => d.cat);  // nest function allows to group the calculation per level of a factor
+
+        // Set scale domains
+        vis.hamiltonxScale.domain(d3.extent(vis.data, (d) => d.year))
+        vis.hamiltonyScale.domain([0, d3.max(vis.hamiltonData, (d) => d.stat)])
+        vis.comparexScale.domain(d3.extent(vis.data, (d) => d.year))
+        vis.compareyScale.domain([0, d3.max(vis.compareData, (d) => d.stat)])
+
+        vis.hamiltonxAxis.tickSizeOuter(0);
+        vis.comparexAxis.tickSizeOuter(0);
+
+        // color palette
+        vis.colorScale = d3.scaleOrdinal()
+                .range(['#e41a1c','#377eb8','#4daf4a'])
+
+        vis.renderVis()
+    }
+  
+    //leave this empty for now...
+    renderVis() { 
+        let vis = this;
+
+        vis.chart.selectAll(".line")
+            .data(vis.hamiltonSumstat)
+            .join("path")
+                .attr("stroke", (d) => vis.colorScale(d[0]))
+                .attr('fill', 'none')
+                .attr('stroke-width', 2)
+                .attr("d", function(d){
+                    return d3.line()
+                        .x((d) => vis.hamiltonxScale(d.year))
+                        .y((d) => vis.hamiltonyScale(d.stat))
+                        (d[1]) //this is the array of values 
+                })
+
+        vis.chart2.selectAll(".line")
+            .data(vis.compareSumstat)
+            .join("path")
+                .attr("stroke", (d) => vis.colorScale(d[0]))
+                .attr('fill', 'none')
+                .attr('stroke-width', 2)
+                .attr("d", function(d){
+                    return d3.line()
+                        .x((d) => vis.comparexScale(d.year))
+                        .y((d) => vis.compareyScale(d.stat))
+                        (d[1]) //this is the array of values 
+                })
+        
+        // Update axis
+        vis.hamiltonxAxisG.call(vis.hamiltonxAxis);
+
+        vis.comparexAxisG.call(vis.comparexAxis);
+
+        vis.hamiltonyAxisG.call(vis.hamiltonyAxis);
+
+        vis.compareyAxisG.call(vis.compareyAxis);
+    }  
 }

@@ -5,7 +5,8 @@ class V1 {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 140,
-            margin: { top: 40, bottom: 30, right: 50, left: 50 }
+            margin: { top: 40, bottom: 35, right: 50, left: 50 },
+            inputCounty: 'Honolulu'
         }
   
         this.data = _data;
@@ -22,9 +23,7 @@ class V1 {
         //set up the width and height of the area where visualizations will go- factoring in margins               
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
-        
-        // group the data: I want to draw one line per group
-        vis.sumstat = d3.group(vis.data, d => d.cat); // nest function allows to group the calculation per level of a factor
+        vis.chartWidth = vis.width / 2 - 30;
     
         // // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement)
@@ -34,43 +33,115 @@ class V1 {
         // Add svg title
         vis.svg.append("text")
             .attr("y", 25)
-            .attr("x", vis.width / 2 + 100)
-            .attr("text-anchor", "middle")
+            .attr("x", vis.chartWidth - 60)
+            .attr("text-anchor", "end")
             .attr("font-size", "20px")
             .text("AQI Changes Over Time");
 
         // // Append group element that will contain our actual chart (see margin convention)
         vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
-    
+        vis.chart2 = vis.svg.append('g')
+            .attr('transform', `translate(${vis.config.margin.left + vis.chartWidth + 80},${vis.config.margin.top})`);
+
         // // Initialize axes
         // Add X axis
-        vis.xScale = d3.scaleLinear().range([ 0, vis.width ]);
-        vis.xAxis = d3.axisBottom(vis.xScale).tickSizeOuter(0)
-            .ticks(d3.count(vis.data, (d) => d.year) / 6);    
+        vis.hamiltonxScale = d3.scaleLinear().range([ 0, vis.chartWidth ]);
+        vis.hamiltonxAxis = d3.axisBottom(vis.hamiltonxScale).tickFormat(d3.format("d")); // Remove thousand comma
+        vis.comparexScale = d3.scaleLinear().range([ 0, vis.chartWidth ]);
+        vis.comparexAxis = d3.axisBottom(vis.comparexScale).tickFormat(d3.format("d")); // Remove thousand comma
+            
+        // vis2.xScale = d3.scaleLinear().range([ 0, vis.chartWidth ]);
+        // vis2.xAxis = d3.axisBottom(vis.xScale).tickSizeOuter(0)
+        //     .ticks(d3.count(vis.data, (d) => d.year) / 12);    
         // Year is divided by 3 cuz each year appears 3 times (median, max, and 90th percentile), and we only need
-        // each year once. Then divided by 2 so only every other year appears (thus divided by 6).
+        // each year once. Then divided by 4 so only every other year appears (thus divided by 12).
         
-        vis.xAxisG = vis.chart.append("g")
+        vis.hamiltonxAxisG = vis.chart.append("g")
             .attr("class", "axis x-axis")
             .attr("transform", `translate(0, ${vis.height})`)
+        vis.hamiltonxAxisG.append("text")
+            .attr("y", 30)
+            .attr("x", vis.chartWidth / 2)
+            .attr("text-anchor", "middle")
+            .attr("stroke", "black")
+            .text("Year");
+
+        vis.comparexAxisG = vis.chart2.append("g")
+            .attr("class", "axis x-axis")
+            .attr("transform", `translate(0, ${vis.height})`)
+        vis.comparexAxisG.append("text")
+            .attr("y", 30)
+            .attr("x", vis.chartWidth / 2)
+            .attr("text-anchor", "middle")
+            .attr("stroke", "black")
+            .text("Year");
 
         // Add Y axis
-        vis.yScale = d3.scaleLinear().range([ vis.height, 0 ]);
-        vis.yAxis = d3.axisLeft(vis.yScale).tickSizeOuter(0);
+        vis.hamiltonyScale = d3.scaleLinear().range([ vis.height, 0 ]);
+        vis.compareyScale = d3.scaleLinear().range([ vis.height, 0 ]);
+        vis.hamiltonyAxis = d3.axisLeft(vis.hamiltonyScale).tickSizeOuter(0);
+        vis.compareyAxis = d3.axisLeft(vis.compareyScale).tickSizeOuter(0);
 
-        vis.yAxisG = vis.chart.append("g")
+        vis.hamiltonyAxisG = vis.chart.append("g")
             .attr("class", "axis y-axis");
-  
+        vis.hamiltonyAxisG.append("text")
+            .attr("y", 15)
+            .attr("dy", "-5.1em")
+            .attr("x", - vis.height / 2 + 5)
+            .attr("transform", "rotate(-90)")
+            .attr("text-anchor", "end")
+            .attr("stroke", "black")
+            .text("AQI");
+
+        vis.compareyAxisG = vis.chart2.append("g")
+            .attr("class", "axis y-axis");
+        vis.compareyAxisG.append("text")
+            .attr("y", 15)
+            .attr("dy", "-5.1em")
+            .attr("x", - vis.height / 2 + 5)
+            .attr("transform", "rotate(-90)")
+            .attr("text-anchor", "end")
+            .attr("stroke", "black")
+            .text("AQI");
     }
 
     updateVis() { 
         let vis = this;
 
+        // Remove old lines
+        vis.chart.selectAll("path").remove();
+        vis.chart2.selectAll("path").remove();
+
+        // Process data
+        vis.hamiltonData = []
+        vis.data.forEach(d => {
+            if (d.county == "Hamilton") {
+                vis.hamiltonData.push({"year": d.year, "cat": d.cat, "stat": d.stat});
+            }
+        }); 
+
+        vis.compareData = []
+        vis.data.forEach(d => {
+            if (d.county == vis.config.inputCounty) {
+                vis.compareData.push({"year": d.year, "cat": d.cat, "stat": d.stat});
+            }
+        });
+
+        // group the data: I want to draw one line per group
+        vis.hamiltonSumstat = d3.group(vis.hamiltonData, d => d.cat);  // nest function allows to group the calculation per level of a factor
+        vis.compareSumstat = d3.group(vis.compareData, d => d.cat);  // nest function allows to group the calculation per level of a factor
+
         // Set scale domains
-        vis.xScale.domain(d3.extent(vis.data, (d) => d.year))
-        vis.yScale.domain([0, d3.max(vis.data, (d) => d.stat)])
-                // color palette
+        vis.hamiltonxScale.domain(d3.extent(vis.data, (d) => d.year))
+        vis.comparexScale.domain(d3.extent(vis.data, (d) => d.year))
+        vis.hamiltonyScale.domain([0, d3.max(vis.hamiltonData, (d) => d.stat)])
+        vis.compareyScale.domain([0, d3.max(vis.compareData, (d) => d.stat)])
+
+        vis.hamiltonxAxis.tickSizeOuter(0);
+        vis.comparexAxis.tickSizeOuter(0);
+
+        // color palette
         vis.colorScale = d3.scaleOrdinal()
                 .range(['#e41a1c','#377eb8','#4daf4a'])
 
@@ -82,35 +153,38 @@ class V1 {
         let vis = this;
 
         vis.chart.selectAll(".line")
-            .data(vis.sumstat)
+            .data(vis.hamiltonSumstat)
             .join("path")
                 .attr("stroke", (d) => vis.colorScale(d[0]))
                 .attr('fill', 'none')
                 .attr('stroke-width', 2)
                 .attr("d", function(d){
                     return d3.line()
-                        .x((d) => vis.xScale(d.year))
-                        .y((d) => vis.yScale(d.stat))
+                        .x((d) => vis.hamiltonxScale(d.year))
+                        .y((d) => vis.hamiltonyScale(d.stat))
                         (d[1]) //this is the array of values 
                 })
-        
-        // Update axis
-        vis.xAxisG.call(vis.xAxis)
-            .append("text")
-                .attr("y", 3)
-                .attr("x", vis.width + 25)
-                .attr("text-anchor", "end")
-                .attr("stroke", "black")
-                .text("Year");
 
-        vis.yAxisG.call(vis.yAxis)
-            .append("text")
-                .attr("y", 15)
-                .attr("dy", "-5.1em")
-                .attr("x", - vis.height / 2 + 5)
-                .attr("transform", "rotate(-90)")
-                .attr("text-anchor", "end")
-                .attr("stroke", "black")
-                .text("AQI");
+        vis.chart2.selectAll(".line")
+            .data(vis.compareSumstat)
+            .join("path")
+                .attr("stroke", (d) => vis.colorScale(d[0]))
+                .attr('fill', 'none')
+                .attr('stroke-width', 2)
+                .attr("d", function(d){
+                    return d3.line()
+                        .x((d) => vis.comparexScale(d.year))
+                        .y((d) => vis.compareyScale(d.stat))
+                        (d[1]) //this is the array of values 
+                })
+
+        // Update axis
+        vis.hamiltonxAxisG.call(vis.hamiltonxAxis);
+
+        vis.comparexAxisG.call(vis.comparexAxis);
+
+        vis.hamiltonyAxisG.call(vis.hamiltonyAxis);
+
+        vis.compareyAxisG.call(vis.compareyAxis);
     }  
 }

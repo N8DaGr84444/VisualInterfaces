@@ -9,18 +9,32 @@
 <body onload="defaultTab()">
     <h1>Project 1: Bad Air</h1>
     <div class="tab">
-        <button class="tablinks" onclick="openView(event, 'overTime')" id="defaultOpen">Over Time</button>
-        <button class="tablinks" onclick="openView(event, 'current')">Current</button>
+        <button class="tablinks" onclick="openView(event, 'aqiOverview')" id="defaultOpen">AQI Overview</button>
+        <button class="tablinks" onclick="openView(event, 'aqiPollutant')">AQI by Pollutant</button>
+        <select id="county-selection" style="float: right; height: 47px;">
+            <option value="Honolulu">Honolulu, Hawaii</option>
+            <option value="Montgomery">Montgomery, Maryland</option>
+            <option value="Nassau">Nassau, Florida</option>
+            <option value="Aroostook">Aroostook, Maine</option>
+            <option value="Saint Louis">Saint Louis, Missouri</option>
+            <option value="Queens">Queens, New York</option>
+            <option value="Columbia">Columbia, Oregon</option>
+            <option value="Guayama">Guayama, Puerto Rico</option>
+            <option value="Charleston">Charleston, Sourth Carolina</option>
+            <option value="Davidson">Davidson, Tennessee</option>
+            <option value="Dallas">Dallas, Texas</option>
+            <option value="Los Angeles">Los Angeles, California</option>
+        </select>
     </div>
 
-    <div id="overTime" class="tabcontent">
+    <div id="aqiOverview" class="tabcontent">
         <svg id="v1"></svg>
-        <svg id="v2"></svg>
+        <svg id="v4"></svg>
         <svg id="v3"></svg>
     </div>
 
-    <div id="current" class="tabcontent">
-        <svg id="v4"></svg>
+    <div id="aqiPollutant" class="tabcontent">
+        <svg id="v2"></svg>
         <svg id="v5"></svg>
     </div>
 

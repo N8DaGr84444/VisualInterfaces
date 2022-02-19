@@ -1,6 +1,8 @@
 console.log("Hello world");
 
-d3.csv('data/annual_aqi_hamilton_county.csv')
+let vis1, vis2, vis3, vis4, vis5
+
+d3.csv('data/annual_aqi_by_county.csv')
 .then(data => {
     console.log('Data loading complete. Work with dataset.');
 
@@ -10,29 +12,29 @@ d3.csv('data/annual_aqi_hamilton_county.csv')
     let v4data = []
     let v5data = []
     data.forEach(d => {
-        v1data.push({"year": +d.Year, "cat": "median", "stat": +d['Median AQI']})
-        v1data.push({"year": +d.Year, "cat": "max", "stat": +d['Max AQI']})
-        v1data.push({"year": +d.Year, "cat": "90p", "stat": +d['90th Percentile AQI']})
-        v2data.push({"cat": "co", "year": +d.Year, "stat": +d['Days CO']})
-        v2data.push({"cat": "no2", "year": +d.Year, "stat": +d['Days NO2']})
-        v2data.push({"cat": "ozone", "year": +d.Year, "stat": +d['Days Ozone']})
-        v2data.push({"cat": "so2", "year": +d.Year, "stat": +d['Days SO2']})
-        v2data.push({"cat": "pm25", "year": +d.Year, "stat": +d['Days PM2.5']})
-        v2data.push({"cat": "pm10", "year": +d.Year, "stat": +d['Days PM10']})
-        v3data.push({"year": +d.Year, "stat": (365 - +d['Days with AQI'])})
+        v1data.push({"year": +d.Year, "cat": "median", "stat": +d['Median AQI'], "state": d['State'], "county": d['County']})
+        v1data.push({"year": +d.Year, "cat": "max", "stat": +d['Max AQI'], "state": d['State'], "county": d['County']})
+        v1data.push({"year": +d.Year, "cat": "90p", "stat": +d['90th Percentile AQI'], "state": d['State'], "county": d['County']})
+        v2data.push({"cat": "co", "year": +d.Year, "stat": +d['Days CO'], "state": d['State'], "county": d['County']})
+        v2data.push({"cat": "no2", "year": +d.Year, "stat": +d['Days NO2'], "state": d['State'], "county": d['County']})
+        v2data.push({"cat": "ozone", "year": +d.Year, "stat": +d['Days Ozone'], "state": d['State'], "county": d['County']})
+        v2data.push({"cat": "so2", "year": +d.Year, "stat": +d['Days SO2'], "state": d['State'], "county": d['County']})
+        v2data.push({"cat": "pm25", "year": +d.Year, "stat": +d['Days PM2.5'], "state": d['State'], "county": d['County']})
+        v2data.push({"cat": "pm10", "year": +d.Year, "stat": +d['Days PM10'], "state": d['State'], "county": d['County']})
+        v3data.push({"year": +d.Year, "stat": (365 - +d['Days with AQI']), "state": d['State'], "county": d['County']})
         if (d.Year == 2021) {
-            v4data.push({"total": +d['Days with AQI'], "cat": "good", "stat": +d['Good Days']})
-            v4data.push({"total": +d['Days with AQI'], "cat": "moderate", "stat": +d['Moderate Days']})
-            v4data.push({"total": +d['Days with AQI'], "cat": "unhealthySensitive", "stat": +d['Unhealthy for Sensitive Groups Days']})
-            v4data.push({"total": +d['Days with AQI'], "cat": "unhealthy", "stat": +d['Unhealthy Days']})
-            v4data.push({"total": +d['Days with AQI'], "cat": "veryUnhealthy", "stat": +d['Very Unhealthy Days']})
-            v4data.push({"total": +d['Days with AQI'], "cat": "hazardous", "stat": +d['Hazardous Days']})
-            v5data.push({"total": +d['Days with AQI'], "cat": "co", "stat": +d['Days CO']})
-            v5data.push({"total": +d['Days with AQI'], "cat": "no2", "stat": +d['Days NO2']})
-            v5data.push({"total": +d['Days with AQI'], "cat": "ozone", "stat": +d['Days Ozone']})
-            v5data.push({"total": +d['Days with AQI'], "cat": "so2", "stat": +d['Days SO2']})
-            v5data.push({"total": +d['Days with AQI'], "cat": "pm25", "stat": +d['Days PM2.5']})
-            v5data.push({"total": +d['Days with AQI'], "cat": "pm10", "stat": +d['Days PM10']})
+            v4data.push({"total": +d['Days with AQI'], "cat": "Good", "stat": +d['Good Days'], "state": d['State'], "county": d['County']})
+            v4data.push({"total": +d['Days with AQI'], "cat": "Moderate", "stat": +d['Moderate Days'], "state": d['State'], "county": d['County']})
+            v4data.push({"total": +d['Days with AQI'], "cat": "Unhealthy-Sensitive", "stat": +d['Unhealthy for Sensitive Groups Days'], "state": d['State'], "county": d['County']})
+            v4data.push({"total": +d['Days with AQI'], "cat": "Unhealthy", "stat": +d['Unhealthy Days'], "state": d['State'], "county": d['County']})
+            v4data.push({"total": +d['Days with AQI'], "cat": "Very Unhealthy", "stat": +d['Very Unhealthy Days'], "state": d['State'], "county": d['County']})
+            v4data.push({"total": +d['Days with AQI'], "cat": "Hazardous", "stat": +d['Hazardous Days'], "state": d['State'], "county": d['County']})
+            v5data.push({"total": +d['Days with AQI'], "cat": "co", "stat": +d['Days CO'], "state": d['State'], "county": d['County']})
+            v5data.push({"total": +d['Days with AQI'], "cat": "no2", "stat": +d['Days NO2'], "state": d['State'], "county": d['County']})
+            v5data.push({"total": +d['Days with AQI'], "cat": "ozone", "stat": +d['Days Ozone'], "state": d['State'], "county": d['County']})
+            v5data.push({"total": +d['Days with AQI'], "cat": "so2", "stat": +d['Days SO2'], "state": d['State'], "county": d['County']})
+            v5data.push({"total": +d['Days with AQI'], "cat": "pm25", "stat": +d['Days PM2.5'], "state": d['State'], "county": d['County']})
+            v5data.push({"total": +d['Days with AQI'], "cat": "pm10", "stat": +d['Days PM10'], "state": d['State'], "county": d['County']})
         }
     });
     v3data.forEach(d => {
@@ -51,35 +53,35 @@ d3.csv('data/annual_aqi_hamilton_county.csv')
     //Be sure to send it the costsPerYear data 
     // The svg for this element has already been created in index.html, above the timeline circles- check it out
     
-    let vis1 = new V1({
+    vis1 = new V1({
         'parentElement': '#v1',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v1data);
     vis1.updateVis();
 
-    let vis2 = new V2({
+    vis2 = new V2({
         'parentElement': '#v2',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v2data);
     vis2.updateVis();
 
-    let vis3 = new V3({
+    vis3 = new V3({
         'parentElement': '#v3',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v3data);
     vis3.updateVis();
 
-    let vis4 = new V4({
+    vis4 = new V4({
         'parentElement': '#v4',
         'containerHeight': 200,
         'containerWidth': 1000
     }, v4data);
     vis4.updateVis();
 
-    let vis5 = new V5({
+    vis5 = new V5({
         'parentElement': '#v5',
         'containerHeight': 200,
         'containerWidth': 1000
@@ -91,13 +93,16 @@ d3.csv('data/annual_aqi_hamilton_county.csv')
     console.error('Error loading the data');
 });
 
-// function computeDays(disasterDate){
-//     let tokens = disasterDate.split("-");
-
-//     let year = +tokens[0];
-//     let month = +tokens[1];
-//     let day = +tokens[2];
-
-//     return (Date.UTC(year, month-1, day) - Date.UTC(year, 0, 0)) / 24 / 60 / 60 / 1000 ;
-
-// }
+d3.select('#county-selection').on('change', function() {
+  // Get selected county and update charts
+  vis1.config.inputCounty = d3.select(this).property('value');
+  vis1.updateVis();
+  vis2.config.inputCounty = d3.select(this).property('value');
+  vis2.updateVis();  
+  vis3.config.inputCounty = d3.select(this).property('value');
+  vis3.updateVis();
+  vis4.config.inputCounty = d3.select(this).property('value');
+  vis4.updateVis();
+  vis5.config.inputCounty = d3.select(this).property('value');
+  vis5.updateVis();
+});
