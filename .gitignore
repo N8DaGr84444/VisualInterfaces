@@ -3,3 +3,5 @@ __MACOSX/
 Activity6/
 .DS_Store
 annual_aqi_hamilton_county_short.csv
+*.zip
+*.png.png
