@@ -8,7 +8,7 @@ The purpose of this project is to provide a visual interactive assessment of air
 
 [View webpage screenshot](project1img.png)
 
-[View Video walkthrough](BadAirTrendsWalkthrough.mp4)
+[View video walkthrough on YouTube](https://youtu.be/TIj0GVkqQvM) or [Download video walkthrough](BadAirTrendsWalkthrough.mp4)
 
 ## Contents
 - [Purpose of project](#purpose)
