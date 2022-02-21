@@ -15,7 +15,7 @@ The purpose of this project is to provide a visual interactive assessment of air
 - [Preview](#preview)
 - [Data source](#data-source)
 - [Visualization components](#visualization-components)
-- [Outlook of findings](#outlook-of-findings)
+- [Findings and Results](#findings-and-results)
 - [Code Overview](#code-overview)
 
 ## Data Source
@@ -49,6 +49,9 @@ This page shows 2 charts breaking down the measured AQI by each individual pollu
 - *Percentage of Days Each Pollutant was Main Pollutant:* Shows the percentage of days in the year that each pollutant was the pollutant most present.
 - *Percentage of Days in the Year Each Pollutant was Main Pollutant:* Shows the percentage of days in 2021 that each pollutant was the pollutant most present. 
 
+### Data Source:
+This page simply lists the citation for the source of the data used, as described above in the [Data Source](#data-source) section.
+
 ## Findings and Results
 - Generally most counties have decreased their AQI since 1980 by about 50%. Not all have, and there are random spiked years throughout, but the overall trend seems to be decreasing.
 - Bigger cities have higher overall AQIs than smaller areas, which makes sense simply due to higher population and more congestion.
@@ -58,7 +61,7 @@ This page shows 2 charts breaking down the measured AQI by each individual pollu
 
 ## Code Overview
 - The only library used was d3.
-- `index.html` only contains html code, file links, and minimal styling. The rest of the styling is in `css\style.css`, and all of the js is in various files with the `js` directory. Everything is seperated to keep the code clean and organized.
+- `index.html` only contains html code, file links, and minimal styling. The rest of the styling is in `css\style.css`, and all of the js is in various files with the `js` directory. Everything is separated to keep the code clean and organized.
 - The control function for the code is in the file `tabs.js`.
 - `main.js` reads in the data from the `data` directory, processes it and loads it into specifically formatted arrays for each different chart type, and then initializes each chart. It also contains the event listener for the drop-down menu to change the comparison county, and will call the update function of each chart when needed.
 - Each chart type has it's own js file and it's own svg. Each svg contains 2 visuals; the Hamilton county version and the comparison county version of that chart type. The corresponding files for each chart type are as follows:
